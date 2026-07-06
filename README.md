@@ -205,7 +205,7 @@ GROUP BY b.riwi_warehouse_name, c.riwi_city_name;
 
 ## Developer Information
 * **Full Name**: María Chavarriaga Garabato
-* **Clan**: [Insert your Clan name here, e.g., Clan Gates / Clan Lovelace]
+* **Clan**: [Clan 5 Garabato]
 
 ## Entity Relationship Model (ERM)
 
