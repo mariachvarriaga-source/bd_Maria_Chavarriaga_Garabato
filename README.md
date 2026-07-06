@@ -1,6 +1,4 @@
--- =============================================================================
--- 1. SCRIPT DDL: CREACIÓN DE ESTRUCTURAS (EN INGLÉS CON PREFIJO RIWI_)
--- =============================================================================
+
 
 -- Crear tabla de Ciudades
 CREATE TABLE riwi_cities (
