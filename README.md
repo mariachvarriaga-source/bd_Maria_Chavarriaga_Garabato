@@ -46,7 +46,6 @@ The schema consists of 6 tables optimized with explicit primary keys (`PK`), for
 
 ---
 
-## Entity Relationship Model (ERM)
 
 
 * **riwi_cities (1) -> (N) riwi_suppliers**: A city can host many unique suppliers.
@@ -129,4 +128,84 @@ INSERT INTO riwi_cities (riwi_city_name) VALUES
 INSERT INTO riwi_categories (riwi_category_name) VALUES 
 ('Herramienta'), ('Consumible'), ('EPP'), ('Elementos Protección');
 
+INSERT INTO riwi_suppliers (riwi_supplier_name, riwi_city_id) VALUES 
+('Aceros del Norte S.A.S', 2), ('Industriales SAS', 1), ('Suministros Global SAS', 3);
+
+INSERT INTO riwi_warehouses (riwi_warehouse_name, riwi_city_id) VALUES 
+('Bodega Costa', 3), ('Centro Logístico Norte', 2), ('Bodega Central', 1);
+
+INSERT INTO riwi_products (riwi_product_name, riwi_category_id) VALUES 
+('Disco de Corte 4.5', 1), ('Electrodo E6013', 2), ('Guante Nitrilo', 3), 
+('Guantes de Nitrilo', 4), ('Soldadura E6013', 2), ('Casco Industrial', 3);
+
+INSERT INTO riwi_inventory_movements (riwi_purchase_order, riwi_movement_date, riwi_movement_type, riwi_quantity, riwi_unit_price, riwi_product_id, riwi_supplier_id, riwi_warehouse_id) VALUES
+('PO-1049', '2026-04-01', 'OUT', 148, 115388.00, 1, 1, 1),
+('PO-1041', '2026-02-14', 'IN',  27,  35506.00,  2, 1, 1),
+('PO-1022', '2026-01-01', 'IN',  70,  14290.00,  3, 2, 1),
+('PO-1075', '2026-02-16', 'IN',  160, 117524.00, 4, 1, 2),
+('PO-1091', '2026-02-28', 'OUT', 40,  139836.00, 2, 2, 3),
+('PO-1041', '2026-03-06', 'IN',  130, 88512.00,  1, 1, 3),
+('PO-1059', '2026-01-20', 'OUT', 33,  43746.00,  5, 1, 3),
+('PO-1035', '2026-04-13', 'OUT', 119, 23022.00,  3, 2, 1),
+('PO-1032', '2026-04-17', 'IN',  185, 123653.00, 4, 3, 3),
+('PO-1009', '2026-02-02', 'OUT', 87,  123108.00, 2, 3, 3),
+('PO-1040', '2026-05-23', 'IN',  175, 39944.00,  4, 2, 1),
+('PO-1023', '2026-03-19', 'OUT', 199, 118291.00, 1, 1, 3),
+('PO-1029', '2026-01-25', 'OUT', 131, 71980.00,  3, 2, 2),
+('PO-1035', '2026-03-15', 'OUT', 134, 89964.00,  1, 1, 1),
+('PO-1094', '2026-03-12', 'IN',  124, 52910.00,  1, 2, 3),
+('PO-1046', '2026-04-26', 'IN',  61,  136736.00, 1, 2, 3),
+('PO-1043', '2026-03-03', 'OUT', 169, 18022.00,  1, 2, 2),
+('PO-1083', '2026-03-21', 'OUT', 192, 108802.00, 6, 1, 1),
+('PO-1036', '2026-03-11', 'OUT', 78,  37943.00,  2, 1, 2);
+```
+
+---
+
+## Explanation of Each SQL Query
+
+### Query 1: Operational Transaction Metrics
+```sql
+SELECT 
+    riwi_movement_type,
+    SUM(riwi_quantity) AS total_units,
+    SUM(riwi_quantity * riwi_unit_price) AS total_value
+FROM riwi_inventory_movements
+GROUP BY riwi_movement_type;
+```
+* **Explanation**: Aggregates data from the transaction ledger to calculate total units moved and the gross monetary calculation (Quantity × Price) grouped distinctly by operational flow type (`IN` vs `OUT`).
+
+### Query 2: Product Velocity Ranking
+```sql
+SELECT 
+    p.riwi_product_name,
+    SUM(m.riwi_quantity) AS units_moved
+FROM riwi_inventory_movements m
+JOIN riwi_products p ON m.riwi_product_id = p.riwi_product_id
+GROUP BY p.riwi_product_name
+ORDER BY units_moved DESC;
+```
+* **Explanation**: Joins the product names table with transactional histories using the foreign key relationship. It tallies total quantities per individual product line and sorts them dynamically from highest to lowest velocity.
+
+### Query 3: Geographical Warehouse Logistical Metrics
+```sql
+SELECT 
+    b.riwi_warehouse_name,
+    c.riwi_city_name,
+    COUNT(m.riwi_movement_id) AS distinct_operations,
+    SUM(m.riwi_quantity) AS dynamic_stock
+FROM riwi_warehouses b
+JOIN riwi_cities c ON b.riwi_city_id = c.riwi_city_id
+JOIN riwi_inventory_movements m ON b.riwi_warehouse_id = m.riwi_warehouse_id
+GROUP BY b.riwi_warehouse_name, c.riwi_city_name;
+```
+* **Explanation**: Resolves multi-table relationships to generate inventory indicators. It counts total transaction events and total volume handled per storage building alongside its respective physical city context.
+
+---
+
+## Developer Information
+* **Full Name**: María Chavarriaga Garabato
+* **Clan**: [Insert your Clan name here, e.g., Clan Gates / Clan Lovelace]
+
+## Entity Relationship Model (ERM)
 
