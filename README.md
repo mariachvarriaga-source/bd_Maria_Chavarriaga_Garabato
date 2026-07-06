@@ -207,5 +207,4 @@ GROUP BY b.riwi_warehouse_name, c.riwi_city_name;
 * **Full Name**: María Chavarriaga Garabato
 * **Clan**: [Clan 5 Garabato]
 
-## Entity Relationship Model (ERM)
 
